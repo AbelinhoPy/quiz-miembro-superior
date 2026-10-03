@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repaso de Anatomía — Miembro Superior</title>
+<style>
+  :root{
+    --bg-deep: #0b1420;
+    --ink: #f2f0e8;
+    --muted: #93a0b8;
+    --a1: #e8c27a;
+    --a2: #d9636b;
+    --a3: #52b788;
+    --geni: #4ea8de;
+    --card: #131c2e;
+    --card-border: rgba(255,255,255,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 15% -5%, #1c2740 0%, var(--bg-deep) 55%);
+    color: var(--ink);
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 20px 14px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .stage{ width:100%; max-width: 780px; }
+
+  .menu{ text-align:center; }
+  .menu h1{
+    font-size: clamp(24px, 5.5vw, 38px);
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  .menu h1 span{color: var(--a1);}
+  .menu p.sub{ color: var(--muted); margin: 0 0 8px; font-size: 14.5px; }
+  .menu p.author{ color: var(--muted); margin: 0 0 24px; font-size: 12px; font-style: italic; }
+
+  .deck-grid{ display:grid; gap: 14px; grid-template-columns: 1fr; }
+  @media(min-width:560px){ .deck-grid{grid-template-columns: 1fr 1fr;} }
+
+  .deck-card{
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 18px 20px;
+    text-align:left;
+    cursor:pointer;
+    transition: transform .15s ease;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    touch-action: manipulation;
+    user-select: none;
+  }
+  .deck-card:active{ transform: scale(0.98); }
+  @media(hover: hover){
+    .deck-card:hover{ transform: translateY(-4px); }
+  }
+  .deck-card .icon{
+    flex-shrink:0; width:46px; height:46px; border-radius: 12px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,.06);
+  }
+  .deck-card .icon svg{ width:26px; height:26px; }
+  .deck-card .txt{ flex:1; min-width:0; }
+  .deck-card .count{
+    position:absolute; top:14px; right:16px;
+    font-size: 22px; font-weight:800; color: rgba(255,255,255,.10);
+  }
+  .deck-card .tag{ display:block; font-size:11px; font-weight:700; letter-spacing:.02em; margin-bottom: 4px; }
+  .deck-card h3{ margin: 0 0 4px; font-size: 17px; }
+  .deck-card p{ margin:0; color: var(--muted); font-size: 12.5px; line-height:1.45;}
+
+  .deck-card.a1{ border-color: rgba(232,194,122,.25); } .deck-card.a1 .icon{background:rgba(232,194,122,.14);} .deck-card.a1 .tag{color:var(--a1);}
+  .deck-card.a2{ border-color: rgba(217,99,107,.25); } .deck-card.a2 .icon{background:rgba(217,99,107,.14);} .deck-card.a2 .tag{color:var(--a2);}
+  .deck-card.a3{ border-color: rgba(82,183,136,.25); } .deck-card.a3 .icon{background:rgba(82,183,136,.14);} .deck-card.a3 .tag{color:var(--a3);}
+  .deck-card.geni{ border-color: rgba(78,168,222,.25); } .deck-card.geni .icon{background:rgba(78,168,222,.14);} .deck-card.geni .tag{color:var(--geni);}
+  .deck-card.d1{ border-color: rgba(242,166,90,.3); } .deck-card.d1 .icon{background:rgba(242,166,90,.16);} .deck-card.d1 .tag{color:#f2a65a;}
+  .deck-card.mix{ grid-column: 1 / -1; border-color: rgba(255,255,255,.18); }
+  .deck-card.mix .icon{ background: rgba(255,255,255,.10); }
+  .deck-card.mix .tag{ color: var(--ink); }
+
+  .hud{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; gap: 10px; }
+  .hud .pill{
+    background: var(--card); border:1px solid var(--card-border); border-radius: 100px;
+    padding: 7px 16px; font-size: 13px; font-weight:600; color: var(--muted);
+    display:flex; align-items:center; gap:6px;
+  }
+  .hud .pill b{color:var(--ink); font-weight:800;}
+  .timerwrap{ flex:1; height: 10px; background: rgba(255,255,255,.08); border-radius: 100px; overflow:hidden; margin: 0 8px; }
+  .timerbar{ height:100%; width:100%; background: linear-gradient(90deg, var(--a3), var(--a1)); border-radius:100px; transition: width 0.1s linear, background .3s ease; }
+
+  .qbanner{ display:flex; align-items:center; gap:10px; margin-bottom: 14px; color: var(--muted); font-size: 12px; font-weight:700; letter-spacing:.02em; }
+  .qbanner .icon{ width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,.06); }
+  .qbanner .icon svg{ width:18px; height:18px; }
+
+  .qcard{
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 20px;
+    padding: 22px 20px; margin-bottom: 16px; min-height: 80px; display:flex; align-items:center;
+  }
+  .qcard p{ margin:0; font-size: clamp(15.5px, 2.8vw, 18.5px); font-weight:700; line-height:1.4; }
+
+  .answers{ display:grid; grid-template-columns: 1fr; gap: 12px; }
+  @media(min-width:560px){ .answers{grid-template-columns: 1fr 1fr;} }
+
+  .ans-btn{
+    text-align:left; border:none; border-radius: 14px; padding: 16px 18px; font-size: 14px;
+    font-weight:600; color:white; cursor:pointer; display:flex; gap: 12px; align-items:flex-start;
+    line-height:1.35; transition: transform .1s ease, filter .15s ease, opacity .2s ease;
+    touch-action: manipulation; user-select: none; min-height: 54px;
+  }
+  .ans-btn .shape{ flex-shrink:0; width: 20px; height:20px; border-radius:6px; background: rgba(255,255,255,.35); margin-top:1px; }
+  .ans-btn:active{ transform: scale(0.98); }
+  .ans-btn.c1{ background: #7c5cbf; }
+  .ans-btn.c2{ background: #2f9e8f; }
+  .ans-btn.c3{ background: #d9636b; }
+  .ans-btn.c4{ background: #3b7dd8; }
+  .ans-btn.correct{ background: var(--a3) !important; }
+  .ans-btn.wrong{ background: #4c5670 !important; opacity:.55; }
+  .ans-btn:disabled{ cursor:default; }
+
+  .feedback{ text-align:center; padding: 20px 10px 10px; }
+  .feedback .icon{ font-size: 42px; margin-bottom:6px; }
+  .feedback h2{ margin: 0 0 10px; font-size: 22px; }
+  .feedback .expl{
+    background: var(--card); border:1px solid var(--card-border); border-radius: 14px;
+    padding: 15px 18px; font-size: 13.5px; color: var(--muted); line-height:1.55; text-align:left; margin-bottom: 22px;
+  }
+  .feedback .expl b{color:var(--ink);}
+
+  .btn-primary{
+    background: var(--a1); color: #241a06; border:none; padding: 14px 28px; border-radius: 100px;
+    font-weight:800; font-size: 15px; cursor:pointer; transition: transform .1s ease;
+    touch-action: manipulation; user-select: none;
+  }
+  .btn-primary:active{ transform: scale(0.98); }
+  .btn-ghost{
+    background: transparent; border: 1px solid var(--card-border); color: var(--muted);
+    padding: 12px 22px; border-radius: 100px; font-size: 14px; cursor:pointer; margin: 6px;
+    touch-action: manipulation; user-select: none;
+  }
+
+  .final{ text-align:center; padding: 20px 10px; }
+  .final .score-big{
+    font-size: 54px; font-weight: 900; margin: 6px 0 2px;
+    background: linear-gradient(90deg, var(--a1), var(--a2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .final .score-label{ color:var(--muted); font-size:13px; margin-bottom: 18px;}
+  .final .msg{ font-size:17px; font-weight:700; margin-bottom: 22px;}
+  .final-actions{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:24px; }
+  .review-list{ text-align:left; margin: 0 0 24px; display:flex; flex-direction:column; gap:8px; max-height: 380px; overflow-y:auto; }
+  .review-item{
+    background: var(--card); border:1px solid var(--card-border); border-radius: 12px;
+    padding: 12px 14px; font-size: 12.5px; display:flex; gap:10px; align-items:flex-start; color: var(--muted);
+  }
+  .review-item.wrong{ border-color: rgba(217,99,107,.35); }
+  .review-item b{ color: var(--ink); }
+
+  .mode-toggle{ display:flex; gap:10px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+  .mode-btn{ background:var(--card); border:1px solid var(--card-border); color:var(--muted); padding:10px 18px; border-radius:100px; font-size:13px; font-weight:700; cursor:pointer; touch-action: manipulation; user-select: none;}
+  .mode-btn.active{ background: var(--a1); color:#241a06; border-color:transparent; }
+  .study-answer{ text-align:left; grid-column: 1 / -1; }
+  .study-correct{ background: rgba(82,183,136,.15); border:1px solid rgba(82,183,136,.4); color: var(--ink); padding:14px 16px; border-radius:12px; font-weight:700; font-size:15px; margin-bottom:10px; }
+  .study-expl{ color:var(--muted); font-size:13px; line-height:1.5; margin-bottom:16px; }
+  .study-btns{ display:flex; gap:10px; flex-wrap:wrap; }
+  .btn-know{ background: var(--a3); color:#08241a; border:none; padding: 14px 22px; border-radius: 100px; font-weight:800; font-size: 14px; cursor:pointer; touch-action: manipulation; }
+  .btn-forgot{ background: var(--a2); color:#2a0508; border:none; padding: 14px 22px; border-radius: 100px; font-weight:800; font-size: 14px; cursor:pointer; touch-action: manipulation; }
+  .showbtn{ grid-column: 1 / -1; background: var(--a1); color:#241a06; border:none; padding: 18px; border-radius: 14px; font-weight:800; font-size: 15px; cursor:pointer; touch-action: manipulation;}
+  .hidden{ display:none !important; }
+  .foot-note{ text-align:center; color: var(--muted); font-size: 11px; margin-top: 22px; line-height:1.5; }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div id="menu" class="menu">
+    <h1>Anatomía — <span>Miembro Superior</span></h1>
+    <p class="sub">Osteología, Artrología, Miología, Topografía y Sistema Neurovascular.</p>
+    <p class="author">Apuntes de estudio personal</p>
+    <div class="mode-toggle">
+      <button id="modeQuizBtn" class="mode-btn active" onclick="setMode('quiz')">🎮 Quiz (con opciones)</button>
+      <button id="modeStudyBtn" class="mode-btn" onclick="setMode('study')">🧠 Estudio (recordá antes de ver)</button>
+    </div>
+
+    <div class="deck-grid">
+
+      <!-- Osteología -->
+      <div class="deck-card a1" onclick="startGame('osteo_cintura')">
+        <span class="count">10</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--a1)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9c0-1.5 1.5-3 3-3s3 1.5 3 3v6c0 1.5-1.5 3-3 3s-3-1.5-3-3V9z"/><path d="M13 9c0-1.5 1.5-3 3-3s3 1.5 3 3v6c0 1.5-1.5 3-3 3s-3-1.5-3-3V9z"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">OSTEOLOGÍA</span>
+          <h3>Cintura pectoral, húmero y antebrazo</h3>
+          <p>Clavícula, escápula, diáfisis y epífisis del húmero, radio, cúbito y carpo.</p>
+        </div>
+      </div>
+
+      <!-- Artrología -->
+      <div class="deck-card a3" onclick="startGame('articulaciones')">
+        <span class="count">7</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--a3)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M10 12h4"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">ARTROLOGÍA</span>
+          <h3>Hombro, codo y muñeca</h3>
+          <p>Articulación glenohumeral, ligamentos de refuerzo, codo y radiocarpiana.</p>
+        </div>
+      </div>
+
+      <!-- Miología Brazo y Antebrazo -->
+      <div class="deck-card d1" onclick="startGame('musculos_brazo_antebrazo')">
+        <span class="count">7</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f2a65a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8c3-2.5 13-2.5 16 0"/><path d="M4 16c3 2.5 13 2.5 16 0"/><path d="M8 8v8"/><path d="M16 8v8"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">MIOLOGÍA I</span>
+          <h3>Brazo y compartimentos del antebrazo</h3>
+          <p>Bíceps, braquial, tríceps, flexores superficiales y profundos, extensores.</p>
+        </div>
+      </div>
+
+      <!-- Mano y Topografía -->
+      <div class="deck-card a2" onclick="startGame('mano_y_topografia')">
+        <span class="count">8</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--a2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v7"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 11a4 4 0 0 1 4 4v2a6 6 0 0 1-6 6h-2a8 8 0 0 1-7.5-5.2L4.6 11.2a1.8 1.8 0 0 1 3.2-1.6L10 12.5"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">MANO Y TOPOGRAFÍA</span>
+          <h3>Espacios axilares, túnel carpiano y mano</h3>
+          <p>Velpeau, tabaquera anatómica, canal del pulso, eminencia tenar e interóseos.</p>
+        </div>
+      </div>
+
+      <!-- Vasos, Nervios y Linfáticos -->
+      <div class="deck-card geni" onclick="startGame('vasos_nervios_linfaticos')">
+        <span class="count">7</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--geni)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">NEUROVASCULAR</span>
+          <h3>Plexo braquial, arterias y linfa</h3>
+          <p>Troncos y fascículos, colaterales axilares, arcos palmares y ganglios axilares.</p>
+        </div>
+      </div>
+
+      <!-- Repaso Total -->
+      <div class="deck-card mix" onclick="startGame('todo')">
+        <span class="count">39</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/><path d="M4 12h16"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">REPASO TOTAL</span>
+          <h3>Todo Miembro Superior al azar</h3>
+          <p>Las 39 preguntas integradas de anatomía clínica y funcional.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="game" class="hidden">
+    <div class="hud">
+      <div class="pill">Pregunta <b id="qnum">1</b>/<span id="qtotal">10</span></div>
+      <div class="timerwrap"><div class="timerbar" id="timerbar"></div></div>
+      <div class="pill">🔥 <b id="streak">0</b></div>
+    </div>
+    <div class="qbanner"><div class="icon" id="qicon"></div><span id="qdecklabel">BLOQUE</span></div>
+    <div class="qcard"><p id="qtext">...</p></div>
+    <div class="answers" id="answers"></div>
+  </div>
+
+  <div id="feedback" class="hidden feedback">
+    <div class="icon" id="fbicon">✅</div>
+    <h2 id="fbtitle">¡Correcto!</h2>
+    <div class="expl" id="fbexpl"></div>
+    <button class="btn-primary" onclick="nextQuestion()">Siguiente →</button>
+  </div>
+
+  <div id="final" class="hidden final">
+    <div class="score-label">TU PUNTAJE</div>
+    <div class="score-big" id="finalscore">0/0</div>
+    <div class="msg" id="finalmsg"></div>
+    <div class="final-actions">
+      <button class="btn-primary" onclick="backToMenu()">Elegir otro bloque</button>
+      <button class="btn-ghost" onclick="startGame(currentDeck)">Repetir bloque</button>
+      <button id="btnRetryWrong" class="btn-ghost hidden" onclick="retryWrongQuestions()">Reintentar falladas ❌</button>
+    </div>
+    <div class="review-list" id="reviewlist"></div>
+  </div>
+
+  <div class="foot-note">📚 Banco de preguntas estructurado a partir del resumen ilustrado de Miembro Superior (Christian Raúl Aguilar Paniagua / Anatomía Humana Latarjet).</div>
+</div>
+
+<script>
+const DECK_META = {
+  osteo_cintura:           {label:"OSTEOLOGÍA · Miembro Superior"},
+  articulaciones:          {label:"ARTROLOGÍA · Hombro, Codo y Muñeca"},
+  musculos_brazo_antebrazo:{label:"MIOLOGÍA · Brazo y Antebrazo"},
+  mano_y_topografia:       {label:"TOPOGRAFÍA Y MANO"},
+  vasos_nervios_linfaticos:{label:"NEUROVASCULAR Y LINFÁTICOS"},
+  todo:                    {label:"REPASO TOTAL · MIEMBRO SUPERIOR"}
+};
+
+const DECKS = {
+  osteo_cintura: [
+    {q:"¿Qué función mecánica cumple la clavícula al actuar como arbotante?", a:["Mantiene el hombro separado del tórax, otorgando el máximo rango de libertad de movimiento","Transmite directamente el peso del tórax hacia el cúbito","Bloquea la abducción del brazo por encima de los 90 grados","Fija la escápula de manera inmóvil a la primera costilla"], c:0, e:"Osteología · Clavícula. Funciona como un soporte mecánico que proyecta el miembro superior lateralmente respecto al tórax."},
+    {q:"¿Cuáles estructuras forman la tuberosidad para el ligamento coracoclavicular en la cara inferior de la clavícula?", a:["El tubérculo conoide y la línea trapezoide","El canal subclavio y la impresión costoclavicular","La cresta deltoidea y la fosa subescapular","El tubérculo supraglenoideo y la espina"], c:0, e:"Osteología · Clavícula. Se ubica hacia la extremidad acromial y recibe a los ligamentos conoide y trapezoide."},
+    {q:"¿Qué músculo se inserta en el labio superior de la espina de la escápula?", a:["Trapecio","Deltoides","Elevador de la escápula","Serrato anterior"], c:0, e:"Osteología · Escápula. El labio superior de la espina recibe al músculo trapecio; el labio inferior da origen al deltoides."},
+    {q:"¿En qué reparo anatómico de la escápula se origina la cabeza larga del tríceps braquial?", a:["Tubérculo infraglenoideo","Tubérculo supraglenoideo","Vértice de la apófisis coracoides","Espina de la escápula"], c:0, e:"Osteología · Escápula. El tubérculo infraglenoideo origina la cabeza larga del tríceps; el supraglenoideo origina la cabeza larga del bíceps."},
+    {q:"¿Qué músculos se insertan en las carillas superior, media e inferior del tubérculo mayor (troquíter) del húmero?", a:["Supraespinoso, infraespinoso y redondo menor","Subescapular, pectoral mayor y dorsal ancho","Deltoides, braquial y coracobraquial","Redondo mayor, dorsal ancho y tríceps"], c:0, e:"Osteología · Húmero. El troquíter aloja la inserción de estos 3 músculos del manguito rotador (de superior a inferior)."},
+    {q:"En el surco intertubercular (corredera bicipital), ¿dónde se inserta el músculo dorsal ancho?", a:["En el fondo del surco","En el labio lateral exclusivamente","En el labio medial","En el cuello anatómico"], c:0, e:"Osteología · Húmero. Nemotecnia clásica: 'Un dorsal entre dos mayores' (pectoral mayor en labio lateral, redondo mayor en labio medial y dorsal ancho en el fondo)."},
+    {q:"¿Qué elementos vasculonerviosos cruzan el canal de torsión (surco del nervio radial) en la diáfisis del húmero?", a:["Nervio radial y arteria braquial profunda","Nervio axilar y arteria circunfleja humeral posterior","Nervio cubital y arteria colateral cubital superior","Nervio mediano y arteria braquial"], c:0, e:"Osteología/Topografía · Húmero. Recorren la cara posterior de arriba a abajo y de medial a lateral."},
+    {q:"¿Qué fosa de la epífisis distal del húmero es ocupada por el olécranon durante la extensión completa del codo?", a:["Fosa olecraneana","Fosa coronoidea","Fosa radial","Fosa subescapular"], c:0, e:"Osteología · Húmero distal. La fosa olecraneana es posterior y recibe al olécranon del cúbito durante la extensión."},
+    {q:"¿Qué carillas articulares presenta la cara inferior de la epífisis distal del radio para el carpo?", a:["Una carilla lateral triangular para el escafoides y una medial cuadrangular para el semilunar","Una carilla para el trapecio y otra para el piramidal","Una fosa esférica para el hueso grande y el pisiforme","Una carilla única no dividida para el piramidal"], c:0, e:"Osteología · Radio distal. La carilla carpiana del radio articula únicamente con el escafoides y el semilunar."},
+    {q:"¿Cuál es el único hueso de la fila proximal del carpo que se considera sesamoideo y se articula únicamente con el piramidal?", a:["Pisiforme","Escafoides","Semilunar","Trapezoide"], c:0, e:"Osteología · Carpo. El pisiforme actúa como superestructura sobre la cara anterior del piramidal y da inserción al flexor cubital del carpo."}
+  ],
+  articulaciones: [
+    {q:"¿Qué tipo de articulación sinovial es la glenohumeral y cuál es la función de su labrum?", a:["Esferoidea (enartrosis); anillo fibrocartilaginoso que aumenta la profundidad y superficie de contacto","Troclear (ginglimo); membrana que secreta líquido peritoneal","Elipsoidea (condílea); ligamento óseo que bloquea la rotación","Trocoide (pivote); rodete que evita la flexión del codo"], c:0, e:"Artrología · Hombro. La cabeza esférica del húmero es mucho mayor que la glena; el labrum o rodete compensa esa incongruencia."},
+    {q:"¿Dónde se localiza el foramen oval de Weitbrecht y cuál es su trascendencia clínica?", a:["Entre los ligamentos glenohumerales superior y medio; zona de debilidad por donde ocurren luxaciones anteriores","Entre el ligamento conoide y trapezoide; paso del nervio axilar","En la membrana interósea del antebrazo; paso del nervio mediano","Entre el ligamento de Cooper y Bardinet; sitio de compresión cubital"], c:0, e:"Artrología · Glenohumeral. Es el punto débil de la cápsula anterior protegido por fuera por el tendón del subescapular."},
+    {q:"¿Cuál de los siguientes músculos del manguito rotador es el único que actúa como rotador medial?", a:["Subescapular","Supraespinoso","Infraespinoso","Redondo menor"], c:0, e:"Miología/Artrología · Manguito rotador. El subescapular se inserta en el troquín y es rotador medial; infraespinoso y redondo menor son rotadores laterales."},
+    {q:"¿Cómo se clasifican las articulaciones humerocubital, humerorradial y radiocubital proximal del codo?", a:["Troclear (ginglimo), elipsoidea (condílea) y trocoide (pivote)","Enartrosis, plana (artrodia) y silla de montar","Trocoide, troclear y sincondrosis","Condílea, trocoide y anfiartrosis"], c:0, e:"Artrología · Codo. Las tres comparten una sola cavidad sinovial pero tienen diferente género mecánico."},
+    {q:"En el complejo ligamentoso colateral cubital del codo, ¿qué fascículo recibe el nombre de ligamento de Bardinet?", a:["Fascículo posterior (epitróclea al olécranon)","Fascículo anterior (epitróclea a apófisis coronoides)","Fascículo medio transversal","Ligamento anular del radio"], c:0, e:"Artrología · Codo. El fascículo posterior se conoce como ligamento de Bardinet, y las fibras de refuerzo como ligamento de Cooper."},
+    {q:"¿Por qué el cúbito no contacta directamente con el carpo en la articulación de la muñeca (radiocarpiana)?", a:["Porque se interpone el disco articular (ligamento triangular)","Porque la apófisis estiloides cubital está soldada al radio","Porque el hueso pisiforme bloquea el espacio articular","Porque la membrana interósea finaliza en el semilunar"], c:0, e:"Artrología · Radiocarpiana. El disco articular separa la cabeza del cúbito del cóndilo carpiano (piramidal y semilunar)."},
+    {q:"¿Qué función cumple el ligamento anular del radio en la articulación radiocubital proximal?", a:["Rodea la cabeza del radio sin fijarse a ella, manteniéndola contra la escotadura radial de la ulna durante la pronosupinación","Fija la apófisis coronoides directamente a la fosa radial","Bloquea la pronación para proteger el nervio radial","Une el olécranon con la tuberosidad deltoidea"], c:0, e:"Artrología · Codo. Forma un anillo osteofibroso junto a la incisura radial del cúbito para permitir la rotación de la cabeza radial."}
+  ],
+  musculos_brazo_antebrazo: [
+    {q:"¿Qué nervio inerva al compartimento anterior del brazo y a qué músculo atraviesa directamente?", a:["Nervio musculocutáneo; atraviesa al músculo coracobraquial","Nervio mediano; atraviesa al músculo braquial","Nervio radial; atraviesa al tríceps braquial","Nervio axilar; atraviesa al deltoides"], c:0, e:"Miología · Brazo anterior. El coracobraquial es el 'músculo perforado de Casserius' por el nervio musculocutáneo."},
+    {q:"¿Cuál es el flexor más potente y puro del antebrazo sobre el brazo, insertado en la coronoides cubital?", a:["Músculo braquial (anterior)","Músculo bíceps braquial","Músculo braquiorradial","Músculo pronador redondo"], c:0, e:"Miología · Brazo anterior. El braquial actúa como flexor independientemente de la posición de pronación o supinación."},
+    {q:"En el antebrazo, ¿qué músculos del compartimento anterior presentan doble inervación (mediano y cubital)?", a:["Flexor profundo de los dedos (mitad lateral por el mediano y mitad medial por el cubital)","Flexor superficial de los dedos","Pronador redondo y pronador cuadrado","Flexor radial del carpo y palmar largo"], c:0, e:"Miología · Antebrazo anterior. Los tendones para los dedos 2 y 3 reciben ramos del interóseo anterior (mediano), y los dedos 4 y 5 del nervio cubital."},
+    {q:"¿Cuál es la disposición de los tendones de los flexores de los dedos al insertarse en las falanges?", a:["El flexor superficial es perforado (falange media) y el flexor profundo es perforante (falange distal)","El flexor superficial es perforante (falange distal) y el profundo perforado (falange media)","Ambos tendones se unen para insertarse exclusivamente en la falange proximal","El flexor superficial termina en el retináculo y el profundo en los metacarpianos"], c:0, e:"Miología · Antebrazo/Mano. El tendón del flexor superficial se divide en dos lengüetas para dar paso al tendón del flexor profundo."},
+    {q:"¿Qué músculo lateral del antebrazo es inervado por el nervio radial y actúa como flexor con el antebrazo en semipronación?", a:["Braquiorradial (supinador largo)","Supinador (corto)","Extensor radial largo del carpo","Ancóneo"], c:0, e:"Miología · Antebrazo lateral. Aunque está inervado por el radial, el braquiorradial flexiona el codo con eficacia máxima en semipronación."},
+    {q:"¿Qué nervio atraviesa el canal de Frohse entre los dos fascículos del músculo supinador?", a:["Ramo profundo (motor) del nervio radial","Ramo superficial (sensitivo) del nervio radial","Nervio interóseo anterior","Nervio cubital"], c:0, e:"Topografía/Nervios · Antebrazo. El ramo motor profundo del radial atraviesa la arcada de Frohse hacia el plano posterior."},
+    {q:"¿Cuáles son los músculos que conforman el plano profundo del compartimento posterior del antebrazo?", a:["Abductor largo del pulgar, extensor corto del pulgar, extensor largo del pulgar y extensor del índice","Extensor de los dedos, extensor del meñique, extensor cubital del carpo y ancóneo","Braquiorradial, 1er radial, 2do radial y supinador","Pronador cuadrado, flexor largo del pulgar y flexor profundo"], c:0, e:"Miología · Antebrazo posterior. Son los 4 músculos emergentes profundos destinados al pulgar y al índice."}
+  ],
+  mano_y_topografia: [
+    {q:"¿Cuáles son los límites musculares del cuadrilátero de Velpeau (espacio axilar lateral) y qué contiene?", a:["Redondo menor, redondo mayor, tríceps (cabeza larga) y húmero; contiene el nervio axilar y vasos circunflejos humerales posteriores","Redondo mayor, dorsal ancho y húmero; contiene el nervio radial","Pectoral mayor y clavícula; contiene la vena cefálica","Subescapular y serrato anterior; contiene la arteria torácica lateral"], c:0, e:"Topografía · Región escapular. Comunica la axila con la región posterior del hombro alrededor del cuello quirúrgico."},
+    {q:"¿Qué elementos cruzan por el triángulo humerotricipital (espacio axilar inferior de Avelino Gutiérrez)?", a:["Nervio radial y arteria braquial profunda","Nervio axilar y arteria circunfleja humeral anterior","Arteria circunfleja de la escápula","Nervio mediano y arteria braquial"], c:0, e:"Topografía · Espacios axilares. Da paso al nervio radial y sus vasos satélites hacia el canal de torsión humeral."},
+    {q:"¿Cuáles son los límites anatómicos del canal del pulso en el tercio distal del antebrazo?", a:["Lateral: tendón del braquiorradial; Medial: tendón del flexor radial del carpo; Piso: pronador cuadrado y radio","Lateral: pronador redondo; Medial: flexor cubital del carpo; Techo: aponeurosis","Lateral: extensor radial largo; Medial: tendón del palmar largo; Suelo: cúbito","Entre los tendones del extensor largo y corto del pulgar"], c:0, e:"Topografía · Canal del pulso. Aloja a la arteria radial, sitio habitual de palpación clínica del pulso periférico."},
+    {q:"¿Cuáles son los tendones que delimitan la tabaquera anatómica y qué arteria pasa por su fondo?", a:["Lateral: abductor largo y extensor corto del pulgar; Medial: extensor largo del pulgar; Contiene la arteria radial","Lateral: braquiorradial; Medial: flexor radial del carpo; Contiene la arteria cubital","Lateral: extensor radial largo; Medial: extensor del índice; Contiene la arteria interósea","Lateral: palmar largo; Medial: flexor cubital; Contiene el arco palmar"], c:0, e:"Topografía · Muñeca. En su suelo óseo se encuentran el proceso estiloides del radio, el escafoides y el trapecio."},
+    {q:"¿Qué estructuras pasan exactamente a través del túnel carpiano (por debajo del retináculo flexor)?", a:["1 nervio (mediano) y 9 tendones flexores (4 FSD, 4 FPD y 1 FLP)","El nervio mediano, la arteria radial y los tendones extensores","El nervio cubital, la arteria cubital y 8 tendones flexores","El nervio mediano junto al flexor radial del carpo y palmar largo"], c:0, e:"Topografía · Túnel carpiano. El tendón del flexor radial del carpo tiene un compartimento fibroso propio fuera de la celda común."},
+    {q:"¿Qué nervio y vaso discurren por el canal de Guyon (conducto cubitocarpiano)?", a:["Nervio cubital y vasos cubitales","Nervio mediano y arteria radial","Ramo superficial del nervio radial","Nervio interóseo anterior y vena basílica"], c:0, e:"Topografía · Muñeca palmar. El paquete vasculonervioso cubital pasa superficial al retináculo flexor por el canal de Guyon."},
+    {q:"¿Cuál es la inervación de los cuatro músculos lumbricales de la mano?", a:["1° y 2° (laterales) por el nervio mediano; 3° y 4° (mediales) por el nervio cubital (ramo profundo)","Los cuatro lumbricales son inervados exclusivamente por el nervio mediano","Los cuatro lumbricales son inervados exclusivamente por el nervio cubital","1° y 4° por el nervio radial; 2° y 3° por el nervio cubital"], c:0, e:"Miología · Mano. La inervación motora de los lumbricales refleja el origen de sus tendones en el flexor profundo de los dedos."},
+    {q:"¿Qué función motora específica cumplen los músculos interóseos palmares y dorsales de la mano?", a:["Palmares: aducen (aproximan) los dedos al eje medio; Dorsales: abducen (separan) los dedos","Palmares: extienden las falanges distales; Dorsales: flexionan el pulgar","Palmares: abducen los dedos; Dorsales: aducen los dedos al meñique","Palmares y dorsales realizan exclusivamente la oposición del pulgar"], c:0, e:"Miología · Mano. Nemotecnia: PAD (Palmares Aducen) y DAB (Dorsales Abducen) tomando como referencia el 3er dedo."}
+  ],
+  vasos_nervios_linfaticos: [
+    {q:"¿Cómo se forma el fascículo posterior del plexo braquial en la fosa axilar?", a:["Por la unión de las divisiones posteriores de los tres troncos (superior, medio e inferior)","Por la unión directa de las raíces C7, C8 y T1","Por la división anterior del tronco superior","Por la anastomosis entre los nervios supraescapular y axilar"], c:0, e:"Plexo braquial. Todas las divisiones posteriores convergen en el fascículo posterior, que origina a los nervios axilar y radial."},
+    {q:"¿Cómo se conforma la 'horquilla del nervio mediano' frente a la arteria axilar?", a:["Por la convergencia de la raíz lateral (fascículo lateral) y la raíz medial (fascículo medial)","Por la división terminal del fascículo posterior","Por la unión de los troncos superior y medio","Por la unión del nervio musculocutáneo con el nervio cubital"], c:0, e:"Plexo braquial. Ambas raíces abrazan a la arteria axilar para formar el tronco principal del nervio mediano."},
+    {q:"¿Cuáles son las ramas colaterales que nacen de la arteria axilar?", a:["Torácica superior, toracoacromial, torácica lateral, subescapular y circunflejas humerales anterior y posterior","Braquial profunda, recurrente radial y colateral cubital superior","Interósea común, radial, cubital y dorsal del carpo","Tronco tirocervical, cervical transversa y supraescapular"], c:0, e:"Vascularización · Arteria axilar. Se distribuyen en sus tres porciones delimitadas por el músculo pectoral menor."},
+    {q:"¿Cómo se forman anatómicamente los arcos palmares superficial y profundo de la mano?", a:["Superficial: arteria cubital + rama palmar superficial de la radial; Profundo: arteria radial + rama palmar profunda de la cubital","Superficial: arteria radial + interósea anterior; Profundo: arteria cubital pura","Superficial: arco dorsal del carpo; Profundo: rama carpiana palmar","Superficial y profundo nacen de ramas exclusivas de la arteria braquial"], c:0, e:"Vascularización · Mano. La cubital domina el arco palmar superficial y la radial domina el arco palmar profundo."},
+    {q:"¿Qué trayecto superficial realiza la vena cefálica antes de drenar en la vena axilar?", a:["Asciende por la cara anterolateral, recorre el surco deltopectoral y perfora la fascia clavipectoral","Asciende por la cara medial del brazo y perfora la fascia braquial junto al nervio mediano","Pasa por el canal epitrócleo-olecraniano y se anastomosa con la basílica","Transcurre profunda a los músculos de la espalda junto al nervio accesorio"], c:0, e:"Retorno venoso. La vena cefálica es lateral y desemboca en la vena axilar tras atravesar la fascia en el triángulo clavipectoral."},
+    {q:"¿Cuál es el grupo de ganglios axilares que recibe los eferentes de todos los demás grupos y forma el tronco subclavio?", a:["Grupo apical (subclavio)","Grupo pectoral (anterior)","Grupo braquial (lateral)","Grupo subescapular (posterior)"], c:0, e:"Linfáticos · Axila. El grupo apical se ubica en el vértice axilar y de él sale el tronco linfático subclavio hacia la base del cuello."},
+    {q:"¿Dónde se localizan los ganglios linfáticos supratrocleares y con qué elementos vasculares se relacionan?", a:["De 3 a 4 cm por encima del epicóndilo medial, subcutáneos, junto a la vena basílica y el nervio cutáneo antebraquial medial","En la tabaquera anatómica junto a la arteria radial","En el surco deltopectoral en contacto con la vena cefálica","Debajo del ligamento de Cooper junto a la arteria cubital"], c:0, e:"Linfáticos superficiales. Son nódulos de palpación clínica relevante ante infecciones de los últimos dedos o la mano medial."}
+  ]
+};
+
+DECKS.todo = [].concat(
+  DECKS.osteo_cintura,
+  DECKS.articulaciones,
+  DECKS.musculos_brazo_antebrazo,
+  DECKS.mano_y_topografia,
+  DECKS.vasos_nervios_linfaticos
+);
+
+let mode = 'quiz';
+let currentDeck = 'osteo_cintura';
+let questions = [];
+let idx = 0;
+let score = 0;
+let streak = 0;
+let results = [];
+let timerInterval = null;
+let timeLeft = 25;
+const TIME_LIMIT = 25;
+
+const menuEl = document.getElementById('menu');
+const gameEl = document.getElementById('game');
+const feedbackEl = document.getElementById('feedback');
+const finalEl = document.getElementById('final');
+
+function iconFor(deck){
+  const map = {
+    osteo_cintura:           document.querySelector('.deck-card.a1 .icon')?.innerHTML || '',
+    articulaciones:          document.querySelector('.deck-card.a3 .icon')?.innerHTML || '',
+    musculos_brazo_antebrazo:document.querySelector('.deck-card.d1 .icon')?.innerHTML || '',
+    mano_y_topografia:       document.querySelector('.deck-card.a2 .icon')?.innerHTML || '',
+    vasos_nervios_linfaticos:document.querySelector('.deck-card.geni .icon')?.innerHTML || '',
+    todo:                    document.querySelector('.deck-card.mix .icon')?.innerHTML || ''
+  };
+  return map[deck] || '';
+}
+
+function setMode(m){
+  mode = m;
+  document.getElementById('modeQuizBtn').classList.toggle('active', m==='quiz');
+  document.getElementById('modeStudyBtn').classList.toggle('active', m==='study');
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleOptions(item){
+  const correctText = item.a[item.c];
+  const opts = shuffle(item.a);
+  return { q: item.q, a: opts, c: opts.indexOf(correctText), e: item.e };
+}
+
+function startGame(deck, customQuestions = null){
+  currentDeck = deck;
+  if(customQuestions){
+    questions = shuffle(customQuestions).map(shuffleOptions);
+  } else {
+    questions = shuffle(DECKS[deck]).map(shuffleOptions);
+  }
+  idx = 0; score = 0; streak = 0; results = [];
+  document.getElementById('qtotal').textContent = questions.length;
+  document.getElementById('qdecklabel').textContent = DECK_META[deck] ? DECK_META[deck].label : 'REPASO PERSONALIZADO';
+  document.getElementById('qicon').innerHTML = iconFor(deck);
+  
+  menuEl.classList.add('hidden');
+  finalEl.classList.add('hidden');
+  feedbackEl.classList.add('hidden');
+  gameEl.classList.remove('hidden');
+
+  const timerwrap = document.querySelector('.timerwrap');
+  const streakPill = document.querySelector('.hud .pill:last-child');
+  if(mode === 'study'){
+    timerwrap.style.visibility = 'hidden';
+    streakPill.style.visibility = 'hidden';
+    showStudyCard();
+  } else {
+    timerwrap.style.visibility = '';
+    streakPill.style.visibility = '';
+    showQuestion();
+  }
+}
+
+function showStudyCard(){
+  clearInterval(timerInterval);
+  const item = questions[idx];
+  document.getElementById('qnum').textContent = idx+1;
+  document.getElementById('qtext').textContent = item.q;
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  const btn = document.createElement('button');
+  btn.className = 'showbtn';
+  btn.textContent = '👁️ Mostrar respuesta';
+  btn.onclick = revealStudyAnswer;
+  answersEl.appendChild(btn);
+}
+
+function revealStudyAnswer(){
+  const item = questions[idx];
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'study-answer';
+  wrap.innerHTML = '<div class="study-correct">✅ '+item.a[item.c]+'</div>'
+    + '<div class="study-expl">'+item.e+'</div>'
+    + '<div class="study-btns">'
+    +   '<button class="btn-know" onclick="markStudy(true)">Me acordé ✅</button>'
+    +   '<button class="btn-forgot" onclick="markStudy(false)">No me acordé ❌</button>'
+    + '</div>';
+  answersEl.appendChild(wrap);
+}
+
+function markStudy(knew){
+  const item = questions[idx];
+  results.push({q:item.q, a:item.a, c:item.c, e:item.e, correctText:item.a[item.c], ok:knew});
+  if(knew) score++;
+  idx++;
+  if(idx >= questions.length){ showStudyFinal(); }
+  else { showStudyCard(); }
+}
+
+function showStudyFinal(){
+  document.getElementById('finalscore').textContent = score+'/'+questions.length;
+  const pct = Math.round((score/questions.length)*100);
+  let msg = '';
+  if(pct === 100) msg = '🏆 ¡Excelente memoria anatómica! Probá el modo Quiz para practicar velocidad.';
+  else if(pct >= 80) msg = '💪 Muy bien. Repasá los conceptos que olvidaste.';
+  else if(pct >= 50) msg = '📚 Buen avance, conviene una segunda pasada para afianzar inserciones y relaciones.';
+  else msg = '🔁 Repasá el apunte y volvé a intentarlo.';
+  document.getElementById('finalmsg').textContent = msg;
+
+  renderFinalReview();
+}
+
+function showQuestion(){
+  clearInterval(timerInterval);
+  const item = questions[idx];
+  document.getElementById('qnum').textContent = idx+1;
+  document.getElementById('streak').textContent = streak;
+  document.getElementById('qtext').textContent = item.q;
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  const colors = ['c1','c2','c3','c4'];
+  item.a.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn ' + colors[i%4];
+    btn.innerHTML = '<span class="shape"></span><span>'+opt+'</span>';
+    btn.onclick = ()=>selectAnswer(i);
+    answersEl.appendChild(btn);
+  });
+  timeLeft = TIME_LIMIT;
+  updateTimerBar();
+  timerInterval = setInterval(()=>{
+    timeLeft -= 0.1;
+    updateTimerBar();
+    if(timeLeft<=0){ clearInterval(timerInterval); selectAnswer(-1); }
+  }, 100);
+}
+
+function updateTimerBar(){
+  const pct = Math.max(0, (timeLeft/TIME_LIMIT)*100);
+  const bar = document.getElementById('timerbar');
+  bar.style.width = pct+'%';
+  if(pct < 30){ bar.style.background = 'linear-gradient(90deg, #d9636b, #e8c27a)'; }
+  else{ bar.style.background = 'linear-gradient(90deg, #52b788, #e8c27a)'; }
+}
+
+function selectAnswer(choice){
+  clearInterval(timerInterval);
+  const item = questions[idx];
+  const btns = document.querySelectorAll('.ans-btn');
+  btns.forEach(b=>b.disabled = true);
+  const isCorrect = choice === item.c;
+  if(choice>=0){ btns[choice].classList.add(isCorrect?'correct':'wrong'); }
+  if(!isCorrect){ btns[item.c].classList.add('correct'); }
+
+  if(isCorrect){ score++; streak++; }
+  else{ streak = 0; }
+
+  results.push({q:item.q, a:item.a, c:item.c, e:item.e, correctText:item.a[item.c], chosenText: choice>=0?item.a[choice]:'(sin responder)', ok:isCorrect});
+
+  document.getElementById('fbicon').textContent = isCorrect ? '✅' : (choice<0 ? '⏱️' : '❌');
+  document.getElementById('fbtitle').textContent = isCorrect ? '¡Correcto!' : (choice<0 ? '¡Se acabó el tiempo!' : 'No era esa...');
+  document.getElementById('fbexpl').innerHTML = '<b>Respuesta correcta:</b> '+item.a[item.c]+'<br><br>'+item.e;
+
+  setTimeout(()=>{
+    gameEl.classList.add('hidden');
+    feedbackEl.classList.remove('hidden');
+  }, 450);
+}
+
+function nextQuestion(){
+  feedbackEl.classList.add('hidden');
+  idx++;
+  if(idx >= questions.length){ showFinal(); }
+  else{
+    gameEl.classList.remove('hidden');
+    showQuestion();
+  }
+}
+
+function showFinal(){
+  document.getElementById('finalscore').textContent = score+'/'+questions.length;
+  const pct = Math.round((score/questions.length)*100);
+  let msg = '';
+  if(pct === 100) msg = '🏆 ¡Puntaje perfecto! Dominás los temas de Miembro Superior.';
+  else if(pct >= 80) msg = '💪 Muy buen rendimiento. Ajustá los detalles fallados y estás 10 puntos.';
+  else if(pct >= 50) msg = '📚 Buen intento. Conviene repasar topografía e inervaciones.';
+  else msg = '🔁 Repasá el esquema ilustrado y volvé a probar.';
+  document.getElementById('finalmsg').textContent = msg;
+
+  renderFinalReview();
+}
+
+function renderFinalReview(){
+  const list = document.getElementById('reviewlist');
+  list.innerHTML = '';
+  const wrongResults = results.filter(r => !r.ok);
+
+  wrongResults.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 'review-item wrong';
+    div.innerHTML = '❌ <span><b>'+r.q+'</b><br>Correcta: '+r.correctText+'</span>';
+    list.appendChild(div);
+  });
+
+  const retryBtn = document.getElementById('btnRetryWrong');
+  if(wrongResults.length > 0){
+    retryBtn.classList.remove('hidden');
+  } else {
+    retryBtn.classList.add('hidden');
+  }
+
+  gameEl.classList.add('hidden');
+  feedbackEl.classList.add('hidden');
+  finalEl.classList.remove('hidden');
+}
+
+function retryWrongQuestions(){
+  const wrongItems = results.filter(r => !r.ok).map(r => ({
+    q: r.q,
+    a: r.a,
+    c: r.c,
+    e: r.e
+  }));
+  if(wrongItems.length > 0){
+    startGame(currentDeck, wrongItems);
+  }
+}
+
+function backToMenu(){
+  finalEl.classList.add('hidden');
+  menuEl.classList.remove('hidden');
+}
+</script>
+</body>
+</html>
